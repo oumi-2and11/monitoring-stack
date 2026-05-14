@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitoring Stack</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #0f1117;
+            color: #e0e0e0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .header {
+            width: 100%;
+            padding: 2rem 0;
+            text-align: center;
+            border-bottom: 1px solid #1e2030;
+            background: #161822;
+        }
+        .header h1 { font-size: 1.8rem; font-weight: 600; color: #fff; }
+        .header p { margin-top: 0.5rem; color: #8b8fa3; font-size: 0.95rem; }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            max-width: 960px;
+            width: 100%;
+            padding: 2rem 1.5rem;
+        }
+        .card {
+            background: #161822;
+            border: 1px solid #1e2030;
+            border-radius: 12px;
+            padding: 1.8rem;
+            text-decoration: none;
+            color: #e0e0e0;
+            transition: border-color 0.2s, transform 0.15s;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+        .card:hover {
+            border-color: #3b82f6;
+            transform: translateY(-2px);
+        }
+        .card .icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            margin-bottom: 0.4rem;
+        }
+        .card .title { font-size: 1.1rem; font-weight: 600; color: #fff; }
+        .card .desc { font-size: 0.85rem; color: #8b8fa3; line-height: 1.5; }
+        .card .url { font-size: 0.8rem; color: #3b82f6; font-family: monospace; margin-top: auto; }
+        .orange { background: #f9731622; color: #f97316; }
+        .blue   { background: #3b82f622; color: #3b82f6; }
+        .red    { background: #ef444422; color: #ef4444; }
+        .green  { background: #22c55e22; color: #22c55e; }
+        .purple { background: #a855f722; color: #a855f7; }
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        .badge-auth { background: #f9731622; color: #f97316; }
+        .badge-open { background: #22c55e22; color: #22c55e; }
+        .footer {
+            margin-top: auto;
+            padding: 1.5rem;
+            text-align: center;
+            color: #555;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Prometheus + Grafana Monitoring Stack</h1>
+        <p>Docker Compose | Nginx Reverse Proxy | BasicAuth</p>
+    </div>
+    <div class="grid">
+        <a class="card" href="/grafana/">
+            <div class="icon blue">&#9638;</div>
+            <div class="title">Grafana <span class="badge badge-auth">Auth</span></div>
+            <div class="desc">Dashboard visualization. Host & Docker overview, Flask service metrics, alert status.</div>
+            <div class="url">/grafana/</div>
+        </a>
+        <a class="card" href="/prometheus/">
+            <div class="icon orange">&#9733;</div>
+            <div class="title">Prometheus <span class="badge badge-auth">Auth</span></div>
+            <div class="desc">Metrics collection, targets status, alert rules, service discovery (static + file_sd).</div>
+            <div class="url">/prometheus/</div>
+        </a>
+        <a class="card" href="/alertmanager/">
+            <div class="icon red">&#9888;</div>
+            <div class="title">Alertmanager <span class="badge badge-auth">Auth</span></div>
+            <div class="desc">Alert routing, grouping, and notification. Webhook receiver integration.</div>
+            <div class="url">/alertmanager/</div>
+        </a>
+        <a class="card" href="/alert-receiver/">
+            <div class="icon purple">&#9993;</div>
+            <div class="title">Alert Receiver <span class="badge badge-auth">Auth</span></div>
+            <div class="desc">Webhook endpoint displaying received alert JSON with timestamp and severity.</div>
+            <div class="url">/alert-receiver/</div>
+        </a>
+        <a class="card" href="/flask/">
+            <div class="icon green">&#9654;</div>
+            <div class="title">Flask App <span class="badge badge-open">Open</span></div>
+            <div class="desc">Monitored service with / /error /slow /metrics endpoints. Business metrics source.</div>
+            <div class="url">/flask/</div>
+        </a>
+    </div>
+    <div class="footer">
+        Auth: admin / monitoring2025 &nbsp;|&nbsp; Grafana: admin / admin &nbsp;|&nbsp; Viewer: viewer / viewer123
+    </div>
+</body>
+</html>

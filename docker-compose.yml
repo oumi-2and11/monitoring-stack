@@ -7,6 +7,7 @@ services:
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./nginx/.htpasswd:/etc/nginx/.htpasswd:ro
+      - ./nginx/index.html:/usr/share/nginx/html/index.html:ro
     networks:
       - frontend-net
       - monitoring-net
