@@ -1,0 +1,51 @@
+groups:
+  - name: host_alerts
+    rules:
+      - alert: HostHighCpuLoad
+        expr: 100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[2m])) * 100) > 80
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU load on {{ $labels.instance }}"
+          description: "CPU usage is {{ $value | printf \"%.1f\" }}% (threshold 80%)"
+
+      - alert: HostHighMemoryUsage
+        expr: 100 - (100 * node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) > 90
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage on {{ $labels.instance }}"
+          description: "Memory usage is {{ $value | printf \"%.1f\" }}% (threshold 90%)"
+
+  - name: container_alerts
+    rules:
+      - alert: ContainerHighCpu
+        expr: (rate(container_cpu_usage_seconds_total{container_label_com_docker_compose_service!=""}[2m])) * 100 > 80
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Container {{ $labels.container_label_com_docker_compose_service }} high CPU"
+          description: "Container CPU usage is {{ $value | printf \"%.1f\" }}% (threshold 80%)"
+
+      - alert: ContainerRestartCount
+        expr: increase(container_restart_count[10m]) > 3
+        for: 0m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Container {{ $labels.container_label_com_docker_compose_service }} restarting"
+          description: "Container has restarted {{ $value | printf \"%.0f\" }} times in 10 minutes"
+
+  - name: flask_alerts
+    rules:
+      - alert: FlaskAppErrorRateHigh
+        expr: (sum by(job,instance) (rate(flask_http_request_total{status_code=~"5.."}[1m])) / sum by(job,instance) (rate(flask_http_request_total[1m]))) * 100 > 5
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Flask app error rate is high"
+          description: "5xx error rate is {{ $value | printf \"%.1f\" }}% (threshold 5%)"
