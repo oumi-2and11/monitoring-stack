@@ -1,0 +1,149 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "title": "Request QPS (by status code)",
+      "type": "timeseries",
+      "gridPos": { "h": 9, "w": 12, "x": 0, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": {
+        "defaults": { "unit": "reqps" }
+      },
+      "targets": [
+        {
+          "expr": "sum by(status_code) (rate(flask_http_request_total{job=\"flask_app\"}[1m]))",
+          "legendFormat": "{{ status_code }}"
+        }
+      ]
+    },
+    {
+      "title": "Error Rate (%)",
+      "type": "gauge",
+      "gridPos": { "h": 9, "w": 6, "x": 12, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "thresholds": {
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 5 },
+              { "color": "red", "value": 20 }
+            ]
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "(sum(rate(flask_http_request_total{job=\"flask_app\",status_code=~\"5..\"}[1m])) / sum(rate(flask_http_request_total{job=\"flask_app\"}[1m]))) * 100",
+          "legendFormat": "5xx Error Rate"
+        }
+      ]
+    },
+    {
+      "title": "Total Requests",
+      "type": "stat",
+      "gridPos": { "h": 9, "w": 6, "x": 18, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "value" },
+          "unit": "short"
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum(flask_http_request_total{job=\"flask_app\"})",
+          "legendFormat": "Total"
+        }
+      ]
+    },
+    {
+      "title": "Request Latency (P50 / P95 / P99)",
+      "type": "timeseries",
+      "gridPos": { "h": 9, "w": 12, "x": 0, "y": 9 },
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": {
+        "defaults": { "unit": "s" }
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.50, sum by(le) (rate(flask_http_request_duration_seconds_bucket{job=\"flask_app\"}[2m])))",
+          "legendFormat": "P50"
+        },
+        {
+          "expr": "histogram_quantile(0.95, sum by(le) (rate(flask_http_request_duration_seconds_bucket{job=\"flask_app\"}[2m])))",
+          "legendFormat": "P95"
+        },
+        {
+          "expr": "histogram_quantile(0.99, sum by(le) (rate(flask_http_request_duration_seconds_bucket{job=\"flask_app\"}[2m])))",
+          "legendFormat": "P99"
+        }
+      ]
+    },
+    {
+      "title": "Request Latency by Endpoint",
+      "type": "timeseries",
+      "gridPos": { "h": 9, "w": 12, "x": 12, "y": 9 },
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": {
+        "defaults": { "unit": "s" }
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum by(le,endpoint) (rate(flask_http_request_duration_seconds_bucket{job=\"flask_app\"}[2m])))",
+          "legendFormat": "{{ endpoint }} P95"
+        }
+      ]
+    },
+    {
+      "title": "Alert Status",
+      "type": "stat",
+      "gridPos": { "h": 5, "w": 24, "x": 0, "y": 18 },
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 1 }
+            ]
+          },
+          "mappings": [
+            { "type": "value", "options": { "0": { "text": "OK", "color": "green" }, "1": { "text": "FIRING", "color": "red" } } }
+          ]
+        }
+      },
+      "targets": [
+        {
+          "expr": "count(ALERTS{alertname=\"FlaskAppErrorRateHigh\",alertstate=\"firing\"}) or vector(0)",
+          "legendFormat": "FlaskAppErrorRateHigh"
+        }
+      ]
+    }
+  ],
+  "schemaVersion": 39,
+  "tags": ["flask", "service", "business"],
+  "templating": {
+    "list": [
+      {
+        "name": "DS_PROMETHEUS",
+        "type": "datasource",
+        "query": "prometheus",
+        "current": { "selected": true, "text": "Prometheus", "value": "Prometheus" }
+      }
+    ]
+  },
+  "time": { "from": "now-15m", "to": "now" },
+  "title": "Flask Service Overview",
+  "uid": "flask-service-overview",
+  "version": 1
+}
