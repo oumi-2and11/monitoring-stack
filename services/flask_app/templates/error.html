@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card" style="border-left: 4px solid #e74c3c;">
+    <h2 style="color: #c0392b;">模拟服务器错误</h2>
+    <p>此接口故意返回 <strong>HTTP 500</strong> 状态码，用于模拟服务器内部错误场景。</p>
+    <p style="margin-top:0.5rem">在 Grafana 的 Flask Service Overview 面板中，可以看到 5xx 错误率上升；当错误率超过 5% 并持续 1 分钟时，将触发 <strong>FlaskAppErrorRateHigh</strong> 告警。</p>
+</div>
+
+<div class="card">
+    <h2>触发方式</h2>
+    <p>手动访问：连续多次访问本页面</p>
+    <div class="code">PowerShell 脚本：.\scripts\trigger_error.ps1</div>
+    <p style="margin-top:0.75rem; font-size:0.9rem; color:#64748b;">脚本会循环调用 /error 接口约 2 分钟，同时混入 20% 的正常请求，使错误率约为 80%，从而稳定触发告警。</p>
+</div>
+
+<div class="result-box">
+    <div class="result-header">HTTP Response</div>
+    <div class="result-body">Status: 500 Internal Server Error
+
+{
+    "status": "error",
+    "message": "Internal server error"
+}</div>
+</div>
+{% endblock %}

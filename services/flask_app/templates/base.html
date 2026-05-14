@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Flask 监控被测服务{% endblock %}</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, "Microsoft YaHei", "Segoe UI", sans-serif;
+            background: #f4f4f5; color: #1e1e1e; min-height: 100vh;
+        }
+        a { color: #d9534f; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+
+        /* ---- 顶部 ---- */
+        .header {
+            background: #fff; border-bottom: 1px solid #ddd;
+            padding: 1.1rem 2.5rem; display: flex; align-items: center; gap: 0.75rem;
+        }
+        .header h1 { font-size: 1.4rem; color: #d9534f; font-weight: 700; }
+        .header .tag {
+            background: #d9534f; color: #fff; padding: 3px 12px;
+            border-radius: 3px; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.3px;
+        }
+
+        /* ---- 导航栏 ---- */
+        .nav {
+            display: flex; gap: 0; padding: 0 2.5rem;
+            background: #fff; border-bottom: 1px solid #ddd;
+        }
+        .nav a {
+            color: #555; padding: 10px 22px; font-size: 0.95rem;
+            border-bottom: 2px solid transparent; transition: all 0.15s;
+        }
+        .nav a:hover { color: #1e1e1e; text-decoration: none; border-bottom-color: #d9534f; }
+        .nav a.active { color: #d9534f; font-weight: 700; border-bottom-color: #d9534f; }
+
+        /* ---- 内容区 ---- */
+        .content { max-width: 960px; margin: 0 auto; padding: 2.5rem 2rem; }
+
+        /* ---- 卡片 ---- */
+        .card {
+            background: #fff; border: 1px solid #ddd; border-radius: 4px;
+            padding: 2rem; margin-bottom: 1.5rem;
+        }
+        .card h2 { font-size: 1.25rem; margin-bottom: 0.75rem; color: #1e1e1e; }
+        .card p { color: #555; line-height: 1.8; font-size: 1rem; }
+        .card p strong { color: #1e1e1e; }
+
+        /* ---- 代码块 ---- */
+        .code {
+            background: #2b2b2b; border: 1px solid #ddd; border-radius: 4px;
+            padding: 1rem 1.25rem; margin-top: 1rem;
+            font-family: "Cascadia Code", "Fira Code", "Consolas", monospace;
+            font-size: 0.9rem; color: #e0e0e0; overflow-x: auto; white-space: pre;
+        }
+
+        /* ---- 接口卡片网格 ---- */
+        .endpoints { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.25rem; margin-top: 1.5rem; }
+        .ep-card {
+            background: #fff; border: 1px solid #ddd; border-radius: 4px;
+            padding: 1.5rem; text-decoration: none; color: #1e1e1e;
+            transition: all 0.15s; display: flex; flex-direction: column; gap: 0.5rem;
+        }
+        .ep-card:hover { border-color: #d9534f; transform: translateY(-2px); text-decoration: none; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .ep-path {
+            font-family: "Cascadia Code", monospace; color: #d9534f;
+            font-size: 1.1rem; font-weight: 700;
+        }
+        .ep-desc { color: #555; font-size: 0.95rem; line-height: 1.6; flex: 1; }
+        .ep-status { margin-top: 0.5rem; }
+
+        /* ---- 状态标签 ---- */
+        .badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 5px 14px; border-radius: 3px; font-size: 0.85rem; font-weight: 700;
+        }
+        .badge-ok    { background: #e6f4ea; color: #1e7e34; }
+        .badge-err   { background: #fce4e4; color: #c0392b; }
+        .badge-slow  { background: #fff8e1; color: #b8860b; }
+        .badge-metric { background: #e8f4fd; color: #2471a3; }
+
+        .dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+        .dot-green  { background: #2ecc71; }
+        .dot-red    { background: #e74c3c; }
+        .dot-yellow { background: #f1c40f; }
+        .dot-blue   { background: #3498db; }
+
+        /* ---- 结果框 ---- */
+        .result-box {
+            margin-top: 1.5rem; background: #2b2b2b; border: 1px solid #ddd;
+            border-radius: 4px; overflow: hidden;
+        }
+        .result-header {
+            padding: 0.6rem 1.25rem; background: #3c3c3c;
+            font-size: 0.85rem; color: #aaa; font-weight: 700;
+        }
+        .result-body {
+            padding: 1.25rem; font-family: "Cascadia Code", monospace;
+            font-size: 0.9rem; white-space: pre-wrap; color: #e0e0e0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Flask 监控被测服务</h1>
+        <span class="tag">Port 8000</span>
+    </div>
+    <div class="nav">
+        <a href="/" class="{{ 'active' if active == 'home' else '' }}">首页</a>
+        <a href="/error" class="{{ 'active' if active == 'error' else '' }}">/error</a>
+        <a href="/slow" class="{{ 'active' if active == 'slow' else '' }}">/slow</a>
+        <a href="/metrics" class="{{ 'active' if active == 'metrics' else '' }}">/metrics</a>
+    </div>
+    <div class="content">
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>

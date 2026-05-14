@@ -1,6 +1,6 @@
 import time
 import random
-from flask import Flask, Response, jsonify
+from flask import Flask, Response, render_template
 from prometheus_client import Counter, Histogram, generate_latest, CONTENT_TYPE_LATEST
 
 app = Flask(__name__)
@@ -23,14 +23,14 @@ REQUEST_LATENCY = Histogram(
 def index():
     with REQUEST_LATENCY.labels("GET", "/").time():
         REQUEST_COUNT.labels("GET", "/", "200").inc()
-        return jsonify({"status": "ok", "message": "Hello from Flask!"})
+        return render_template("home.html", active="home")
 
 
 @app.route("/error")
 def error():
     with REQUEST_LATENCY.labels("GET", "/error").time():
         REQUEST_COUNT.labels("GET", "/error", "500").inc()
-        return jsonify({"status": "error", "message": "Internal server error"}), 500
+        return render_template("error.html", active="error"), 500
 
 
 @app.route("/slow")
@@ -39,7 +39,7 @@ def slow():
     with REQUEST_LATENCY.labels("GET", "/slow").time():
         time.sleep(delay)
         REQUEST_COUNT.labels("GET", "/slow", "200").inc()
-        return jsonify({"status": "ok", "delay": round(delay, 2)})
+        return render_template("slow.html", active="slow", delay=round(delay, 2))
 
 
 @app.route("/metrics")

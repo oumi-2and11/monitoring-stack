@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card" style="border-left: 4px solid #f1c40f;">
+    <h2 style="color: #b8860b;">模拟慢请求</h2>
+    <p>此接口使用 <strong>time.sleep()</strong> 随机延迟 0.5~3.0 秒后返回 200，模拟业务处理耗时较长的场景。</p>
+    <p style="margin-top:0.5rem">在 Grafana 的 Flask Service Overview 面板中，可以观察到延迟 P95/P99 分位数上升，以及按端点分的延迟分布中 <strong>/slow</strong> 明显高于其他接口。</p>
+</div>
+
+<div class="card">
+    <h2>本次请求</h2>
+    <p>实际延迟：<strong style="color: #d9534f; font-size:1.3rem;">{{ delay }}s</strong></p>
+</div>
+
+<div class="card">
+    <h2>触发方式</h2>
+    <p>手动访问：刷新本页面</p>
+    <div class="code">PowerShell 脚本：.\scripts\trigger_latency.ps1</div>
+</div>
+
+<div class="result-box">
+    <div class="result-header">HTTP Response</div>
+    <div class="result-body">Status: 200 OK
+
+{
+    "status": "ok",
+    "delay": {{ delay }}
+}</div>
+</div>
+{% endblock %}

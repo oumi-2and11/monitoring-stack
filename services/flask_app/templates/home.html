@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <h2>服务说明</h2>
+    <p>这是本项目的自研 Flask 被测服务，使用 <strong>prometheus_client</strong> 库暴露自定义业务指标（Counter + Histogram），供 Prometheus 采集并在 Grafana 中可视化。</p>
+    <p style="margin-top:0.5rem">通过以下接口可以模拟不同类型的请求，观察监控系统的采集与告警效果：</p>
+</div>
+
+<div class="endpoints">
+    <a href="/" class="ep-card">
+        <div class="ep-path">GET /</div>
+        <div class="ep-desc">正常响应接口，返回 200 状态码。用于模拟正常的业务请求流量。</div>
+        <div class="ep-status"><span class="badge badge-ok"><span class="dot dot-green"></span>200 OK</span></div>
+    </a>
+    <a href="/error" class="ep-card">
+        <div class="ep-path">GET /error</div>
+        <div class="ep-desc">模拟服务器错误，返回 500 状态码。用于触发 FlaskAppErrorRateHigh 告警（错误率 &gt; 5% 持续 1 分钟）。</div>
+        <div class="ep-status"><span class="badge badge-err"><span class="dot dot-red"></span>500 Error</span></div>
+    </a>
+    <a href="/slow" class="ep-card">
+        <div class="ep-path">GET /slow</div>
+        <div class="ep-desc">模拟慢请求，随机延迟 0.5~3.0 秒后返回 200。用于观察延迟 P50/P95/P99 分位数变化。</div>
+        <div class="ep-status"><span class="badge badge-slow"><span class="dot dot-yellow"></span>200 Slow</span></div>
+    </a>
+    <a href="/metrics" class="ep-card">
+        <div class="ep-path">GET /metrics</div>
+        <div class="ep-desc">Prometheus 指标端点，暴露 flask_http_request_total（Counter）和 flask_http_request_duration_seconds（Histogram）。</div>
+        <div class="ep-status"><span class="badge badge-metric"><span class="dot dot-blue"></span>Prometheus</span></div>
+    </a>
+</div>
+
+<div class="card" style="margin-top:1.5rem">
+    <h2>指标说明</h2>
+    <p><strong>flask_http_request_total</strong>（Counter）— 请求总数，按 method / endpoint / status_code 分类标签</p>
+    <p style="margin-top:0.25rem"><strong>flask_http_request_duration_seconds</strong>（Histogram）— 请求延迟分布，支持 P50 / P95 / P99 分位数计算</p>
+    <div class="code">Histogram 桶边界: [5ms, 10ms, 25ms, 50ms, 100ms, 250ms, 500ms, 1s, 2.5s, 5s]</div>
+</div>
+
+<div class="card">
+    <h2>相关监控入口</h2>
+    <p>
+        Prometheus Targets: <a href="http://localhost:9090/targets" target="_blank">http://localhost:9090/targets</a><br>
+        Prometheus Alerts: <a href="http://localhost:9090/alerts" target="_blank">http://localhost:9090/alerts</a><br>
+        Grafana Dashboard: <a href="http://localhost:3000" target="_blank">http://localhost:3000</a><br>
+        Alert Receiver: <a href="http://localhost:5001" target="_blank">http://localhost:5001</a>
+    </p>
+</div>
+{% endblock %}
