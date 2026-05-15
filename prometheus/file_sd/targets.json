@@ -1,9 +1,11 @@
 [
-  {
-    "labels": {
-      "job": "flask_app_sd",
-      "env": "dynamic"
-    },
-    "targets": ["flask_app:8000"]
-  }
+    {
+        "labels": {
+            "job": "flask_app_sd",
+            "env": "dynamic"
+        },
+        "targets": [
+            "flask_app:8000"
+        ]
+    }
 ]
